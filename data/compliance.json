@@ -1,0 +1,20 @@
+{
+  "legalLinks": [
+    { "label": "就業歧視及性別平等工作", "href": "" },
+    { "label": "違反勞動法令事業單位（雇主）查詢系統", "href": "" },
+    { "label": "台北市違反勞動法令公布專區", "href": "" },
+    { "label": "職業介紹和定型化契約", "href": "" },
+    { "label": "求職防騙宣導", "href": "" },
+    { "label": "個人隱私及防止性騷擾及其他就業相關訊息", "href": "" }
+  ],
+  "companyDocs": [
+    { "label": "艾卡斯就業服務許可証（台北市政府）", "type": "JPG", "fileUrl": "", "uploadedAt": "" },
+    { "label": "艾卡斯就業服務專業人員證書", "type": "JPG", "fileUrl": "", "uploadedAt": "" },
+    { "label": "艾卡斯申訴處理流程", "type": "PDF", "fileUrl": "", "uploadedAt": "" },
+    { "label": "艾卡斯申訴流程處理機制", "type": "PDF", "fileUrl": "", "uploadedAt": "" },
+    { "label": "艾卡斯收費項目及金額明細表", "type": "PDF", "fileUrl": "", "uploadedAt": "" },
+    { "label": "艾卡斯性騷擾防治措施、申訴及調查處理要點", "type": "PDF", "fileUrl": "", "uploadedAt": "" },
+    { "label": "艾卡斯工作場所性騷擾防治措施及懲戒規範", "type": "PDF", "fileUrl": "", "uploadedAt": "" },
+    { "label": "艾卡斯職業介紹和定型化契約和個人資料使用同意書", "type": "PDF", "fileUrl": "", "uploadedAt": "" }
+  ]
+}
