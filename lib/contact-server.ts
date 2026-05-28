@@ -82,7 +82,7 @@ export async function getAllContactSubmissions(): Promise<ContactSubmission[]> {
       .select('*')
       .order('created_at', { ascending: false })
 
-    if (error) throw new Error(error.message)
+    if (error) return readLocalSubmissions()
     return (data as ContactRow[]).map(toSubmission)
   }
 
@@ -106,6 +106,21 @@ export async function markContactAsRead(id: string): Promise<void> {
     submissions[idx].read = true
     await fs.writeFile(DATA_FILE, JSON.stringify(submissions, null, 2), 'utf-8')
   }
+}
+
+export async function getUnreadContactCount(): Promise<number> {
+  if (hasSupabaseConfig()) {
+    const supabase = getSupabaseAdmin()
+    const { count, error } = await supabase
+      .from('contact_submissions')
+      .select('*', { count: 'exact', head: true })
+      .eq('read', false)
+    if (error) return 0
+    return count ?? 0
+  }
+
+  const submissions = await readLocalSubmissions()
+  return submissions.filter((s) => !s.read).length
 }
 
 async function readLocalSubmissions(): Promise<ContactSubmission[]> {
