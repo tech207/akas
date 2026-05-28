@@ -7,6 +7,22 @@ import { createClient } from '@supabase/supabase-js'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(__dirname, '..')
 
+async function loadLocalEnv() {
+  try {
+    const raw = await readFile(path.join(root, '.env.local'), 'utf-8')
+    for (const line of raw.split(/\r?\n/)) {
+      const match = line.match(/^([A-Z0-9_]+)=(.*)$/)
+      if (!match) continue
+      const [, key, value] = match
+      process.env[key] ??= value
+    }
+  } catch {
+    // Environment variables may already be provided by the shell or CI.
+  }
+}
+
+await loadLocalEnv()
+
 const supabaseUrl = process.env.SUPABASE_URL
 const supabaseServiceKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY
