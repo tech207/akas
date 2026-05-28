@@ -5,6 +5,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { updateCompanyDocFile } from "@/lib/compliance-server";
+import {
+  getSupabaseAdmin,
+  getSupabaseStorageBucket,
+  hasSupabaseConfig
+} from "@/lib/supabase-server";
 
 function sanitizeFileName(fileName: string) {
   const extension = path.extname(fileName).toLowerCase();
@@ -34,17 +39,38 @@ export async function POST(request: NextRequest) {
   }
 
   const safeFileName = sanitizeFileName(file.name);
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "compliance");
-  const uploadPath = path.join(uploadDir, safeFileName);
   const bytes = await file.arrayBuffer();
-
-  await mkdir(uploadDir, { recursive: true });
-  await writeFile(uploadPath, Buffer.from(bytes));
-
-  const fileUrl = `/uploads/compliance/${safeFileName}`;
   const fileExtension = path.extname(file.name).replace(".", "").toUpperCase() || "FILE";
+  let fileUrl = `/uploads/compliance/${safeFileName}`;
 
-  // Persist upload record to compliance.json
+  if (hasSupabaseConfig()) {
+    const supabase = getSupabaseAdmin();
+    const bucket = getSupabaseStorageBucket();
+    const storagePath = `compliance/${safeFileName}`;
+    const { error } = await supabase.storage.from(bucket).upload(
+      storagePath,
+      Buffer.from(bytes),
+      {
+        contentType: file.type || "application/octet-stream",
+        upsert: false
+      }
+    );
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    const { data } = supabase.storage.from(bucket).getPublicUrl(storagePath);
+    fileUrl = data.publicUrl;
+  } else {
+    const uploadDir = path.join(process.cwd(), "public", "uploads", "compliance");
+    const uploadPath = path.join(uploadDir, safeFileName);
+
+    await mkdir(uploadDir, { recursive: true });
+    await writeFile(uploadPath, Buffer.from(bytes));
+  }
+
+  // Persist upload record to the active content store.
   if (typeof label === "string" && label) {
     try {
       await updateCompanyDocFile(label, fileUrl, fileExtension);

@@ -30,3 +30,26 @@
 | Cloudflare R2 | - | 檔案儲存 | PDF 法令文件 / 履歷 / 圖片；相容 S3 API；無流量費用 |
 | Resend + React Email | latest | 電子郵件 | 交易信（聯絡表單回覆）；通知信；支援繁中模板 |
 | Meilisearch | 1.x | 全文搜尋 | 職位 / 候選人快速搜尋；支援中文分詞；自托管 |
+
+## Supabase 串接
+
+後台內容會在設定 Supabase 環境變數後，自動從本機 JSON 切換到 Supabase Database / Storage。
+
+1. 在 Supabase Dashboard 開啟 SQL Editor，執行 `supabase/schema.sql`。
+2. 在 `.env.local` 加上：
+
+```bash
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-or-secret-key
+SUPABASE_STORAGE_BUCKET=akas-assets
+```
+
+3. 匯入目前本機 JSON 內容：
+
+```bash
+npm run seed:supabase
+```
+
+4. 在 Vercel Project Settings -> Environment Variables 加上同樣三個變數，然後重新部署 Production。
+
+`SUPABASE_SERVICE_ROLE_KEY` 或 `sb_secret_...` 只能放在 server-side 環境變數，不要加 `NEXT_PUBLIC_` 前綴，也不要提交到 Git。

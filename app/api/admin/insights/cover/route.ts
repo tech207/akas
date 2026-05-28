@@ -4,6 +4,12 @@ import path from 'path'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+import {
+  getSupabaseAdmin,
+  getSupabaseStorageBucket,
+  hasSupabaseConfig
+} from '@/lib/supabase-server'
+
 function sanitizeFileName(fileName: string) {
   const ext = path.extname(fileName).toLowerCase()
   const base = path
@@ -29,6 +35,28 @@ export async function POST(request: NextRequest) {
   }
 
   const safeFileName = sanitizeFileName(file.name)
+
+  if (hasSupabaseConfig()) {
+    const supabase = getSupabaseAdmin()
+    const bucket = getSupabaseStorageBucket()
+    const storagePath = `insights/${safeFileName}`
+    const { error } = await supabase.storage.from(bucket).upload(
+      storagePath,
+      Buffer.from(await file.arrayBuffer()),
+      {
+        contentType: file.type || 'application/octet-stream',
+        upsert: false
+      }
+    )
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
+    const { data } = supabase.storage.from(bucket).getPublicUrl(storagePath)
+    return NextResponse.json({ ok: true, url: data.publicUrl })
+  }
+
   const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'insights')
   await mkdir(uploadDir, { recursive: true })
   await writeFile(path.join(uploadDir, safeFileName), Buffer.from(await file.arrayBuffer()))
