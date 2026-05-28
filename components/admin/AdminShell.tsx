@@ -3,19 +3,24 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { FileText, Home, Newspaper } from "lucide-react";
+import { FileText, Home, Mail, Newspaper } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { LogoutButton } from "@/components/admin/LogoutButton";
 
 const navItems = [
-  { label: "內容總覽", href: "/admin", icon: Home },
-  { label: "洞見文章", href: "/admin#insights", icon: Newspaper },
-  { label: "法令專區", href: "/admin#compliance", icon: FileText }
+  { label: "內容總覽", href: "/admin", icon: Home, exact: true },
+  { label: "洞見文章", href: "/admin#insights", icon: Newspaper, exact: false },
+  { label: "法令專區", href: "/admin#compliance", icon: FileText, exact: false },
+  { label: "聯絡紀錄", href: "/admin/contacts", icon: Mail, exact: true }
 ];
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-brand-ivory font-sans text-brand-ink">
@@ -38,7 +43,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <div className="flex flex-wrap items-center gap-2">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const active = item.href === "/admin" && pathname === "/admin";
+              const active = item.exact
+                ? pathname === item.href
+                : item.href === "/admin" && pathname === "/admin";
 
               return (
                 <Link

@@ -25,7 +25,8 @@ export default function AdminLoginPage() {
     setLoading(false);
 
     if (res.ok) {
-      router.push("/admin");
+      router.replace("/admin");
+      router.refresh();
     } else {
       setError("帳號或密碼錯誤，請重試。");
     }

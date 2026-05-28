@@ -69,10 +69,22 @@ create trigger set_company_docs_updated_at
 before update on public.company_docs
 for each row execute function public.set_updated_at();
 
+create table if not exists public.contact_submissions (
+  id uuid primary key default gen_random_uuid(),
+  name_zh text not null,
+  name_en text,
+  email text not null,
+  subject text,
+  message text not null,
+  read boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
 alter table public.categories enable row level security;
 alter table public.insights enable row level security;
 alter table public.legal_links enable row level security;
 alter table public.company_docs enable row level security;
+alter table public.contact_submissions enable row level security;
 
 insert into storage.buckets (id, name, public)
 values ('akas-assets', 'akas-assets', true)

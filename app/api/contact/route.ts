@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { saveContactSubmission } from "@/lib/contact-server";
+
 const contactSchema = z.object({
   nameZh: z.string().min(1, "請填寫中文姓名"),
   nameEn: z.string().optional(),
@@ -18,6 +20,12 @@ export async function POST(request: Request) {
       { ok: false, errors: result.error.flatten().fieldErrors },
       { status: 400 }
     );
+  }
+
+  try {
+    await saveContactSubmission(result.data);
+  } catch {
+    return NextResponse.json({ ok: false, error: "儲存失敗，請稍後再試" }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });
