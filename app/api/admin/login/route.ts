@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
-  const { password } = await request.json()
+  const { email, password } = await request.json()
+  const expectedEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase()
+  const submittedEmail = typeof email === 'string' ? email.trim().toLowerCase() : ''
 
-  if (!password || password !== process.env.ADMIN_PASSWORD) {
-    return NextResponse.json({ error: '密碼錯誤' }, { status: 401 })
+  if (
+    (expectedEmail && submittedEmail !== expectedEmail) ||
+    !password ||
+    password !== process.env.ADMIN_PASSWORD
+  ) {
+    return NextResponse.json({ error: '帳號或密碼錯誤' }, { status: 401 })
   }
 
   const response = NextResponse.json({ ok: true })

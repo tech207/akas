@@ -2,10 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { LockKeyhole } from "lucide-react";
+import { LockKeyhole, Mail } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,7 +19,7 @@ export default function AdminLoginPage() {
     const res = await fetch("/api/admin/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password })
+      body: JSON.stringify({ email, password })
     });
 
     setLoading(false);
@@ -26,7 +27,7 @@ export default function AdminLoginPage() {
     if (res.ok) {
       router.push("/admin");
     } else {
-      setError("密碼錯誤，請重試。");
+      setError("帳號或密碼錯誤，請重試。");
     }
   }
 
@@ -58,6 +59,25 @@ export default function AdminLoginPage() {
             className="mt-8 border border-white/10 bg-white/[0.04] p-6"
           >
             <label className="block font-zh text-sm text-white/70">
+              管理員帳號
+            </label>
+            <div className="relative mt-2">
+              <Mail
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40"
+              />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="username"
+                className="h-11 w-full border border-white/15 bg-white/[0.03] pl-10 pr-3 font-sans text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-brand-gold"
+                placeholder="admin@example.com"
+              />
+            </div>
+
+            <label className="mt-4 block font-zh text-sm text-white/70">
               管理員密碼
             </label>
             <div className="relative mt-2">
@@ -70,6 +90,7 @@ export default function AdminLoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                autoComplete="current-password"
                 className="h-11 w-full border border-white/15 bg-white/[0.03] pl-10 pr-3 font-sans text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-brand-gold"
                 placeholder="Enter password"
               />
